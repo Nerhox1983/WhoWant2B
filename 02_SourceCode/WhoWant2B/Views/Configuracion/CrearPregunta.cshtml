@@ -1,0 +1,63 @@
+﻿@model WhoWant2B.Models.PreguntaConOpciones_viewModel
+@{
+    ViewData["Title"] = "Nueva Pregunta con Opciones";
+}
+
+<div class="container mt-5">
+    <div class="p-4 rounded shadow mx-auto" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #e5a65d; max-width: 800px;">
+        <div class="text-center mb-4 border-bottom pb-3" style="border-color: rgba(229, 166, 93, 0.3) !important;">
+            <h2 style="color: #e5a65d; font-weight: bold;">Agregar Nueva Pregunta y Opciones</h2>
+        </div>
+
+        <form asp-action="CrearPregunta" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Pregunta.Texto" class="form-label text-warning font-weight-bold">Enunciado de la Pregunta</label>
+                <textarea asp-for="Pregunta.Texto" class="form-control bg-dark text-white border-secondary" rows="3" required></textarea>
+                <span asp-validation-for="Pregunta.Texto" class="text-danger small"></span>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Pregunta.IdCategoria" class="form-label text-warning font-weight-bold">Categoría</label>
+                    <select asp-for="Pregunta.IdCategoria" class="form-select bg-dark text-white border-secondary" asp-items="ViewBag.IdCategoria" required>
+                        <option value="">-- Seleccione Categoría --</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Pregunta.IdComplejidad" class="form-label text-warning font-weight-bold">Nivel de Complejidad</label>
+                    <select asp-for="Pregunta.IdComplejidad" class="form-select bg-dark text-white border-secondary" asp-items="ViewBag.IdComplejidad" required>
+                        <option value="">-- Seleccione Nivel --</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr style="border-color: #e5a65d;">
+            <h4 class="text-warning mb-3">Opciones de Respuesta</h4>
+
+            @for (int i = 0; i < Model.Opciones.Count; i++)
+            {
+                <div class="row align-items-center mb-3 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                    <div class="col-md-9">
+                        <label class="form-label text-light small">Opción @(i + 1)</label>
+                        <input asp-for="Opciones[i].Texto" class="form-control bg-dark text-white border-secondary" required />
+                        <span asp-validation-for="Opciones[i].Texto" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-3 text-center mt-3">
+                        <label class="form-check-label text-warning small d-block mb-1">¿Es Correcta?</label>
+                        <input type="radio" name="CorrectaIndex" value="@i" @(i == 0 ? "checked" : "") />
+                        <span class="text-light small ms-1">Sí</span>
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <a asp-action="Preguntas" class="btn btn-outline-light btn-sm">Volver</a>
+                <button type="submit" class="btn btn-warning px-4" style="font-weight: bold; color: #1b1c66; background-color: #e5a65d; border: none;">
+                    Guardar Pregunta y Opciones
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+﻿:root {
+    --bg-quiz: #0c0926;
+    --blue-panel: linear-gradient(180deg, #1b1c66 0%, #0c083a 50%, #151654 100%);
+    --gold-text: #e5a65d;
+    --border-silver: linear-gradient(135deg, #ffffff 0%, #8a9ba8 50%, #4a5568 100%);
+    --neon-glow: 0 0 15px rgba(0, 198, 255, 0.6);
+}
+
+/* Contenedor principal del juego */
+.millonario-container {
+    background-color: var(--bg-quiz);
+    background-image: radial-gradient(circle, #1a1b6d 0%, #05051a 80%);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    padding: 40px 20px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    min-height: 400px;
+}
+
+/* Caja de la Pregunta */
+.panel-pregunta {
+    position: relative;
+    width: 85%;
+    max-width: 800px;
+    padding: 20px 40px;
+    background: var(--blue-panel);
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-top: 2px solid #a0aec0;
+    border-bottom: 2px solid #a0aec0;
+    /* Corte de puntas hexagonales */
+    clip-path: polygon(5% 0%, 95% 0%, 100% 50%, 95% 100%, 5% 100%, 0% 50%);
+    box-shadow: var(--neon-glow);
+}
+
+/* Contenedor de las opciones (2x2) */
+.grid-opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    width: 90%;
+    max-width: 900px;
+}
+
+/* Botón / Opción de Respuesta */
+.btn-opcion {
+    position: relative;
+    background: var(--blue-panel);
+    border: none;
+    padding: 15px 35px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    /* Forma hexagonal idéntica a la TV */
+    clip-path: polygon(6% 0%, 94% 0%, 100% 50%, 94% 100%, 6% 100%, 0% 50%);
+    display: flex;
+    align-items: center;
+}
+
+    /* Efecto decorativo del borde metalizado interno */
+    .btn-opcion::before {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        background: var(--blue-panel);
+        clip-path: polygon(6% 0%, 94% 0%, 100% 50%, 94% 100%, 6% 100%, 0% 50%);
+        z-index: 1;
+    }
+
+/* El texto real debe quedar sobre el pseudo-elemento */
+.btn-opcion-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+}
+
+/* Letra del rombo (A, B, C, D) en color naranja/oro */
+.letra-opcion {
+    color: var(--gold-text);
+    font-weight: bold;
+    margin-right: 15px;
+    text-shadow: 0 0 5px rgba(229, 166, 93, 0.5);
+}
+
+.texto-opcion {
+    color: #ffffff;
+}
+
+/* Hover - Resaltado en naranja al pasar el mouse */
+.btn-opcion:hover {
+    background: linear-gradient(180deg, #e5a65d 0%, #b86b11 100%);
+    box-shadow: 0 0 15px rgba(229, 166, 93, 0.8);
+}
+
+    .btn-opcion:hover .texto-opcion {
+        color: #000000;
+        font-weight: bold;
+    }
+
+    .btn-opcion:hover .letra-opcion {
+        color: #ffffff;
+    }
+
+/* Responsive para pantallas móviles */
+@media (max-width: 768px) {
+    .grid-opciones {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .panel-pregunta {
+        font-size: 1.1rem;
+        padding: 15px 25px;
+    }
+}

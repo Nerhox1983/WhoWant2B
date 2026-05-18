@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Panel de Administración";
+}
+
+<div class="container mt-5">
+    <div class="text-center text-white p-4 rounded position-relative" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #e5a65d;">
+
+        <h1 style="color: #e5a65d;" class="mt-2">Panel de Configuración</h1>
+        <p>Bienvenido, Administrador. Seleccione la tabla que desea gestionar:</p>
+
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">Categorías</h5>
+                        <p class="card-text text-light">Gestiona los temas de las preguntas.</p>
+                        <a asp-action="Categorias" class="btn btn-outline-warning">Administrar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title text-warning">Preguntas y Opciones</h5>
+                        <p class="card-text text-light">Crea y edita el banco de trivias.</p>
+                        <a asp-action="Preguntas" class="btn btn-outline-warning">Administrar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a asp-controller="Juego" asp-action="Index" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-box-arrow-right"></i> Salir
+        </a>
+    </div>
+</div>

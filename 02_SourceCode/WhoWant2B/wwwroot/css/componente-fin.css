@@ -1,0 +1,178 @@
+﻿/* ==========================================================================
+   HOJA DE ESTILOS: componente-fin.css
+   Descripción: Estilos exclusivos para la pantalla de finalización y derrota.
+   Alineado exactamente al diseño de la imagen de referencia.
+   ========================================================================== */
+
+/* Contenedor principal: Fondo de espacio/velocidad y centrado absoluto */
+.millonario-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    /* Efecto de fondo: Espacio profundo con destellos radiales */
+    background: radial-gradient(circle, rgba(23,26,74,1) 0%, rgba(7,9,31,1) 70%, rgba(3,4,13,1) 100%);
+    overflow: hidden;
+    font-family: 'Roboto', 'Arial', sans-serif;
+}
+
+/* Panel general invisible (la imagen no tiene una caja contenedora gris/azul central, 
+   los elementos flotan directamente sobre el fondo estrellado) */
+.panel-retiro {
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    animation: fadeInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Título de derrota: Dorado imponente con relieve oscuro */
+.titulo-retiro {
+    color: #f1b83e; /* Dorado brillante */
+    font-size: 4.5rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+    /* Combinación de sombras para dar el efecto 3D y relieve de la imagen */
+    text-shadow: 
+        2px 2px 0px #4a2e00,
+        -2px -2px 0px #fffdf0,
+        3px 5px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Texto secundario informativo: "Te fuiste con las manos vacías..." */
+.subtitulo-retiro {
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+.subtitulo-retiro strong, 
+.subtitulo-retiro b {
+    font-weight: 900;
+}
+
+/* Visualización del puntaje obtenido (0 Puntos) */
+.puntaje-destacado {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 40px 0;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Sección inferior para el botón de acción */
+.contenedor-acciones {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* Botón "Intentar de nuevo": Estructura hexagonal perfecta de TV */
+.btn-volver {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 2.3rem;
+    font-weight: 700;
+    background-color: #0b113a; /* Azul marino profundo */
+    padding: 15px 80px;
+    min-width: 450px;
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    /* Corte de puntas hexagonales estiradas (estilo Millonario) */
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    
+    /* Borde Azul Neón Brillante */
+    border: none;
+    outline: none;
+    filter: drop-shadow(0px 0px 12px #29b6f6);
+}
+
+/* Pseudo-elemento para simular el borde interno cyan brillante e impedir que clip-path lo rompa */
+.btn-volver::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    background: #070a24;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    z-index: 1;
+}
+
+/* Contenido del botón por encima del fondo interno */
+.btn-volver-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Espacio entre el rombo y el texto */
+}
+
+/* Rombo/Diamante dorado a la izquierda del texto */
+.btn-volver-content::before {
+    content: "◆";
+    color: #f1b83e;
+    font-size: 1.8rem;
+    display: inline-block;
+    transform: scaleY(1.2); /* Lo estira un poco verticalmente como en la imagen */
+}
+
+/* Efecto Hover para mejorar la experiencia de usuario */
+.btn-volver:hover {
+    filter: drop-shadow(0px 0px 20px #00e5ff);
+    transform: scale(1.03);
+}
+
+/* Animación de entrada suave */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* --- Ajustes Responsivos para Tablets y Móviles --- */
+@media (max-width: 768px) {
+    .titulo-retiro {
+        font-size: 2.8rem;
+    }
+
+    .subtitulo-retiro {
+        font-size: 1.3rem;
+    }
+
+    .puntaje-destacado {
+        font-size: 1.8rem;
+    }
+
+    .btn-volver {
+        min-width: 90%;
+        padding: 12px 40px;
+        font-size: 1.6rem;
+        clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+    }
+    
+    .btn-volver::before {
+        clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+    }
+}

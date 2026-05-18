@@ -1,0 +1,151 @@
+﻿@model IEnumerable<WhoWant2B.Models.Categoria_model>
+@{
+    ViewData["Title"] = "Gestión de Categorías";
+    int paginaActual = ViewBag.PaginaActual ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+}
+
+<div class="container mt-5">
+    <div class="p-4 rounded shadow" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #e5a65d;">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3" style="border-color: rgba(229, 166, 93, 0.3) !important;">
+            <h1 style="color: #e5a65d; font-weight: bold;">Lista de Categorías</h1>
+            <a asp-action="CrearCategoria" class="btn btn-warning btn-millonario-main">
+                <i class="fas fa-plus"></i> Nueva Categoría
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover border-secondary">
+                <thead style="color: #e5a65d; border-bottom: 2px solid #e5a65d;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th> <!-- Nueva columna añadida -->
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-light">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="align-middle">@item.IdCategoria</td>
+                            <td class="align-middle">@item.Nombre</td>
+                            <td class="align-middle text-break">@item.Descripcion</td> <!-- Campo Descripción añadido -->
+                            <td class="text-center align-middle">
+                                <a asp-action="EditarCategoria" asp-route-id="@item.IdCategoria" class="btn btn-sm btn-millonario-edit me-2">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form asp-action="EliminarCategoria" asp-route-id="@item.IdCategoria" method="post" style="display:inline;" onsubmit="return confirm('¿Está seguro de eliminar esta categoría?');">
+                                    <button type="submit" class="btn btn-sm btn-millonario-delete">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-light small">
+                Página <strong>@paginaActual</strong> de <strong>@totalPaginas</strong> (Total: @ViewBag.TotalRegistros categorías)
+            </div>
+
+            <nav>
+                <ul class="pagination mb-0">
+                    <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Categorias" asp-route-page="@(paginaActual - 1)">Anterior</a>
+                    </li>
+
+                    @for (int i = 1; i <= totalPaginas; i++)
+                    {
+                        <li class="page-item @(i == paginaActual ? "active" : "")">
+                            <a class="page-link" asp-action="Categorias" asp-route-page="@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                        <a class="page-link" asp-action="Categorias" asp-route-page="@(paginaActual + 1)">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="mt-4 border-top pt-3" style="border-color: rgba(229, 166, 93, 0.3) !important;">
+            <a asp-action="Index" class="btn btn-outline-light btn-sm">Volver al Panel</a>
+        </div>
+    </div>
+</div>
+
+@* ESTILOS PERSONALIZADOS INTERFAZ MILLONARIA *@
+<style>
+    .btn-millonario-main {
+        font-weight: bold;
+        color: #1b1c66;
+        background-color: #e5a65d;
+        border: 1px solid #ffffff;
+        transition: all 0.3s ease;
+    }
+
+        .btn-millonario-main:hover {
+            background-color: #ffffff;
+            color: #1b1c66;
+            box-shadow: 0 0 10px #e5a65d;
+        }
+
+    .btn-millonario-edit {
+        background-color: #1b1c66;
+        color: #e5a65d;
+        border: 1px solid #e5a65d;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-millonario-edit:hover {
+            background-color: #e5a65d;
+            color: #1b1c66;
+            border-color: #ffffff;
+            box-shadow: 0 0 8px #e5a65d;
+        }
+
+    .btn-millonario-delete {
+        background-color: #1b1c66;
+        color: #ff8c42;
+        border: 1px solid #ff8c42;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+        .btn-millonario-delete:hover {
+            background-color: #ff8c42;
+            color: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 0 0 8px #ff8c42;
+        }
+
+    .page-link {
+        background-color: #1b1c66 !important;
+        color: #e5a65d !important;
+        border-color: rgba(229, 166, 93, 0.5) !important;
+    }
+
+    .page-item.active .page-link {
+        background-color: #e5a65d !important;
+        color: #1b1c66 !important;
+        border-color: #e5a65d !important;
+        font-weight: bold;
+    }
+
+    .page-item.disabled .page-link {
+        background-color: rgba(27, 28, 102, 0.5) !important;
+        color: rgba(255, 255, 255, 0.3) !important;
+        border-color: rgba(229, 166, 93, 0.2) !important;
+        pointer-events: none;
+    }
+
+    .page-link:hover {
+        background-color: #e5a65d !important;
+        color: #1b1c66 !important;
+    }
+</style>

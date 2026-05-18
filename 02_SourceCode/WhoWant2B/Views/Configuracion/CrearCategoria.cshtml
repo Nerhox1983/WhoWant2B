@@ -1,0 +1,46 @@
+﻿@model WhoWant2B.Models.Categoria_model
+@{
+    ViewData["Title"] = "Nueva Categoría";
+}
+
+<div class="container mt-5">
+    <div class="p-4 rounded shadow mx-auto" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #e5a65d; max-width: 600px;">
+        <div class="text-center mb-4 border-bottom pb-3" style="border-color: rgba(229, 166, 93, 0.3) !important;">
+            <h2 style="color: #e5a65d; font-weight: bold;">Agregar Nueva Categoría</h2>
+            <p class="text-light small">Define un nuevo tema para el banco de preguntas.</p>
+        </div>
+
+        <form asp-action="CrearCategoria" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-4">
+                <label asp-for="Nombre" class="form-label" style="color: #e5a65d; font-weight: bold;">Nombre:</label>
+                <input asp-for="Nombre" class="form-control bg-dark text-white border-secondary"
+                       placeholder="Ej: Historia, Ciencia, Arte..." required autocomplete="off"
+                       style="border-color: rgba(229, 166, 93, 0.5) !important;" />
+                <span asp-validation-for="Nombre" class="text-danger small"></span>
+                <label asp-for="Descripcion" class="form-label" style="color: #e5a65d; font-weight: bold;">Descripción:</label>
+                <input asp-for="Descripcion" class="form-control bg-dark text-white border-secondary"
+                       placeholder="" required autocomplete="off"
+                       style="border-color: rgba(229, 166, 93, 0.5) !important;" />
+                <span asp-validation-for="Descripcion" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-5">
+                <a asp-action="Categorias" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-arrow-left"></i> Volver a la lista
+                </a>
+                <button type="submit" class="btn btn-warning px-4" style="font-weight: bold; color: #1b1c66; background-color: #e5a65d; border: none;">
+                    Guardar Categoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

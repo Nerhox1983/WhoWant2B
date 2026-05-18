@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|f:\\pruebatecnica-ciel2\\02_sourcecode\\whowant2b\\controllers\\configuracion\\configuracioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|solutionrelative:controllers\\configuracion\\configuracioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|f:\\pruebatecnica-ciel2\\02_sourcecode\\whowant2b\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|f:\\pruebatecnica-ciel2\\02_sourcecode\\whowant2b\\views\\configuracion\\editarcategoria.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{33F18B60-BE20-4416-968E-F1345B944ACE}|WhoWant2B.csproj|solutionrelative:views\\configuracion\\editarcategoria.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "EditarCategoria.cshtml",
+              "DocumentMoniker": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Views\\Configuracion\\EditarCategoria.cshtml",
+              "RelativeDocumentMoniker": "Views\\Configuracion\\EditarCategoria.cshtml",
+              "ToolTip": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Views\\Configuracion\\EditarCategoria.cshtml",
+              "RelativeToolTip": "Views\\Configuracion\\EditarCategoria.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-05-16T22:54:47.047Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ConfiguracionController.cs",
+              "DocumentMoniker": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Controllers\\Configuracion\\ConfiguracionController.cs",
+              "RelativeDocumentMoniker": "Controllers\\Configuracion\\ConfiguracionController.cs",
+              "ToolTip": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Controllers\\Configuracion\\ConfiguracionController.cs",
+              "RelativeToolTip": "Controllers\\Configuracion\\ConfiguracionController.cs",
+              "ViewState": "AgIAAFEBAAAAAAAAAAAUwIMAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-17T03:47:48.294Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "F:\\PruebaTecnica-Ciel2\\02_SourceCode\\WhoWant2B\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-18T21:24:59.544Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

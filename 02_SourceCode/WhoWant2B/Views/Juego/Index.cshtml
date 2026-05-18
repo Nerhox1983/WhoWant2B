@@ -1,0 +1,266 @@
+﻿@model WhoWant2B.Models.Pregunta_model
+@{
+    ViewData["Title"] = "Trivia - Who Want 2B";
+}
+
+<link rel="stylesheet" href="~/css/componente-trivia.css" />
+<link rel="stylesheet" href="~/css/componente-fin.css" />
+
+<div class="millonario-container d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh; width: 100%;">
+
+    @* Mensaje de error de login visible sobre el panel de registro *@
+    @if (ViewBag.ErrorLogin != null)
+    {
+        <div class="alert alert-danger text-center mb-3" style="font-weight: bold; max-width: 900px; width: 100%; border: 1px solid #dc3545;">
+            @ViewBag.ErrorLogin
+        </div>
+    }
+    
+    @* CASO 1: SI EL JUEGO NO HA INICIADO - Renderiza el formulario de Registro / Login *@
+    @if (ViewBag.JuegoIniciado != true && ViewBag.Puntaje == 0 && ViewBag.Perdiste != true && ViewBag.Retirado != true && ViewBag.Ganado != true)
+    {
+        <div id="registro-panel" class="container p-4 rounded" style="background: rgba(27, 28, 102, 0.8); border: 2px solid #e5a65d; max-width: 900px; width: 100%;">
+            <form asp-controller="Juego" asp-action="GuardarUsuario" method="post" id="formRegistro">
+    
+        <!--<div id="registro-panel" class="container p-4 rounded" style="background: rgba(27, 28, 102, 0.8); border: 2px solid #e5a65d; max-width: 900px; width: 100%;">
+            <form asp-controller="Juego" asp-action="GuardarUsuario" method="post" id="formRegistro">-->
+                <input type="hidden" name="idRol" value="2" />
+
+                <div class="row text-white">
+                    <div class="col-md-4">
+                        <label for="NombreReal" class="form-label" style="color: #e5a65d; font-weight: bold;">Nombre Real</label>
+                        <input type="text" id="NombreReal" name="nombreReal" class="form-control bg-dark text-white border-secondary" placeholder="Escriba su nombre..." required />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Login" class="form-label" style="color: #e5a65d; font-weight: bold;">Login (Automático)</label>
+                        <input type="text" id="Login" name="login" class="form-control" readonly
+                               style="background-color: #2c2c2c; color: #00ff00; border: 1px solid #555; cursor: not-allowed;"
+                               placeholder="Generando..." required />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Password" class="form-label" style="color: #e5a65d; font-weight: bold;">Password</label>
+                        <input type="password" id="Password" name="password" class="form-control bg-dark text-white border-secondary" required />
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12 text-center">
+                        <button type="submit" id="btnComenzar" class="btn btn-lg" style="background-color: #e5a65d; color: #1b1c66; font-weight: bold; padding: 10px 40px;" disabled="disabled">
+                            ACEPTAR EL RETO
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+    else
+    {
+        @* CASO 2: EL JUEGO YA INICIÓ O FINALIZÓ CON UN ESTADO DETERMINADO *@
+        <div id="trivia-section" style="width: 100%; max-width: 900px;">
+
+            @* Sub-caso A: El jugador decidió retirarse con su puntaje *@
+            @if (ViewBag.Retirado == true)
+            {
+                <div class="panel-retiro text-center p-5 rounded" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #e5a65d;">
+                    <h1 class="titulo-retiro font-weight-bold" style="color: #e5a65d; font-size: 2.5rem;">¡Retiro Voluntario!</h1>
+                    <p class="subtitulo-retiro text-white mt-3 h5">Has decidido asegurar tu acumulado y finalizar el reto de manera inteligente.</p>
+
+                    <div class="my-4 p-3 rounded" style="background: rgba(0, 0, 0, 0.4); border: 1px dashed #e5a65d;">
+                        <span class="text-secondary d-block text-uppercase small" style="letter-spacing: 2px;">Puntaje Asegurado e Histórico Guardado</span>
+                        <p class="puntaje-destacado display-4 font-weight-bold m-0" style="color: #00ff00;">@ViewBag.Puntaje Puntos</p>
+                    </div>
+
+                    <div class="contenedor-acciones mt-4">
+                        <a href="@Url.Action("Index", "Juego")" class="btn btn-lg btn-warning" style="font-weight: bold; color: #1b1c66; padding: 12px 35px;">
+                            Volver a Jugar
+                        </a>
+                    </div>
+                </div>
+            }
+            @* Sub-caso Nuevo: El jugador ganó el juego *@
+            else if (ViewBag.Ganado == true)
+            {
+                <div class="panel-retiro text-center p-5 rounded" style="background: rgba(27, 28, 102, 0.9); border: 2px solid #00ff00;">
+                    <h1 class="titulo-retiro font-weight-bold" style="color: #00ff00; font-size: 3rem; text-shadow: 0 0 10px #00ff00;">¡ERES UN EXPERTO!</h1>
+                    <p class="subtitulo-retiro text-white mt-3 h4">Has superado todos los niveles de complejidad y completado el reto.</p>
+
+                    <div class="my-4 p-4 rounded" style="background: rgba(0, 255, 0, 0.1); border: 2px solid #00ff00;">
+                        <span class="text-white d-block text-uppercase small" style="letter-spacing: 2px;">Puntaje Máximo Alcanzado</span>
+                        <p class="puntaje-destacado display-3 font-weight-bold m-0" style="color: #00ff00;">@ViewBag.Puntaje Puntos</p>
+                    </div>
+
+                    <div class="contenedor-acciones mt-4">
+                        <a href="@Url.Action("Index", "Juego")" class="btn btn-lg btn-success" style="font-weight: bold; padding: 15px 45px; border-radius: 30px;">
+                            Jugar de Nuevo
+                        </a>
+                    </div>
+                </div>
+            }
+            @* Sub-caso B: El jugador perdió *@           
+            else if (ViewBag.Perdiste == true)
+            {
+                <div class="panel-retiro text-center p-4 rounded" style="background: rgba(27, 28, 102, 0.8); border: 2px solid #dc3545;">
+                    <h1 class="titulo-retiro text-danger font-weight-bold">¡Fin del Juego!</h1>
+                    <p class="subtitulo-retiro text-white">Lo sentimos, la respuesta fue incorrecta.</p>
+                    <p class="puntaje-destacado h3" style="color: #e5a65d;">Puntaje final: @ViewBag.Puntaje</p>
+                    <div class="contenedor-acciones mt-4">
+                        <a href="@Url.Action("Index", "Juego")" class="btn btn-lg btn-danger">
+                            <span class="btn-volver-content">Intentar de nuevo</span>
+                        </a>
+                    </div>
+                </div>
+            }
+            @* Sub-caso C: Juego en curso con pregunta disponible *@
+            else if (Model != null)
+            {
+                <div class="d-flex flex-column justify-content-between align-items-center" style="min-height: 70vh; width: 100%;">
+
+                    <div class="w-100 d-flex justify-content-between align-items-center px-4 py-2 rounded mb-4"
+                         style="background: rgba(27, 28, 102, 0.6); border: 1px solid rgba(229, 166, 93, 0.4); max-width: 850px;">
+                        <div class="text-left">
+                            <span class="text-secondary small d-block text-uppercase" style="letter-spacing: 1px;">Categoría</span>
+                            <span class="text-white font-weight-bold">@ViewBag.NombreCategoria</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-secondary small d-block text-uppercase" style="letter-spacing: 1px;">Dificultad</span>
+                            <span class="text-warning font-weight-bold">@ViewBag.NombreComplejidad</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-secondary small d-block text-uppercase" style="letter-spacing: 1px;">Acumulado</span>
+                            <span class="display-5 font-weight-bold m-0" style="color: #00ff00; font-size: 1.3rem;">@ViewBag.Puntaje Pts</span>
+                        </div>
+                    </div>
+
+                    <div class="w-100 my-auto">
+                        <div class="panel-pregunta mb-4 text-center">
+                            <span class="texto-pregunta">@Model.Texto</span>
+                        </div>
+
+                        <form asp-action="ValidarRespuesta" method="post" class="grid-opciones">
+                            <input type="hidden" name="puntajeActual" value="@ViewBag.Puntaje" />
+                            <input type="hidden" name="idComplejidad" value="@ViewBag.IdComplejidad" />
+                            <input type="hidden" name="conteoNivel" value="@ViewBag.ConteoNivel" />
+                            <input type="hidden" name="idsRespondidas" value="@ViewBag.IdsRespondidas" />
+
+                            @foreach (var opcion in Model.Opciones.Select((value, index) => new { value, index }))
+                            {
+                                char letra = (char)('A' + opcion.index);
+                                <button type="submit" name="idOpcion" value="@opcion.value.IdOpcion" class="btn-opcion">
+                                    <div class="btn-opcion-content">
+                                        <span class="letra-opcion">@letra:</span>
+                                        <span class="texto-opcion">@opcion.value.Texto</span>
+                                    </div>
+                                </button>
+                            }
+                        </form>
+                    </div>
+
+                    <div class="mt-4 w-100 text-center">
+                        <form asp-controller="Juego" asp-action="Retirarse" method="post">
+                            <input type="hidden" name="puntajeFinal" value="@ViewBag.Puntaje" />
+                            <input type="hidden" name="idJugador" value="1" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm" style="font-weight: bold; letter-spacing: 1px; rgba(220, 53, 69, 0.2);">
+                                Retirarse con @ViewBag.Puntaje puntos
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                @* Sub-caso D: Contingencia si la base de datos se queda sin preguntas para el nivel actual *@
+                <div class="text-center p-5 text-white rounded" style="background: rgba(27, 28, 102, 0.8); border: 2px solid #e5a65d;">
+                    <h2 style="color: #e5a65d;">¡Sesión Iniciada!</h2>
+                    <p class="mt-3">El juego arrancó bien, pero la tabla <strong>Preguntas</strong> no devolvió registros para la complejidad actual.</p>
+                    <p>Asegúrate de tener preguntas asignadas a esa complejidad en la base de datos.</p>
+                    <a href="@Url.Action("Index", "Juego")" class="btn btn-warning mt-3" style="font-weight:bold; color: #1b1c66;">Volver al Inicio</a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            const $nombreInput = $('#NombreReal');
+            const $passInput = $('#Password');
+            const $loginInput = $('#Login');
+            const $btnComenzar = $('#btnComenzar');
+
+            let usuarioExisteEnBD = false;
+            let timeoutBusqueda = null;
+
+            if ($nombreInput.length > 0 && $passInput.length > 0) {
+
+                function procesarValidacion() {
+                    const nombre = $nombreInput.val().trim();
+                    const pass = $passInput.val().trim();
+
+                    if (!usuarioExisteEnBD) {
+                        if (nombre.length > 0) {
+                            const firstChar = nombre.charAt(0);
+                            const lastChar = nombre.charAt(nombre.length - 1);
+
+                            const now = new Date();
+                            const pad = (n) => n.toString().padStart(2, '0');
+
+                            const year = now.getFullYear();
+                            const month = pad(now.getMonth() + 1);
+                            const day = pad(now.getDate());
+                            const hours = pad(now.getHours());
+                            const minutes = pad(now.getMinutes());
+                            const seconds = pad(now.getSeconds());
+
+                            const loginValue = `${year}${month}${day}-${hours}${minutes}${seconds}_${firstChar}${lastChar}`;
+                            $loginInput.val(loginValue);
+                            $btnComenzar.text('ACEPTAR EL RETO');
+                        } else {
+                            $loginInput.val('');
+                            $btnComenzar.text('ACEPTAR EL RETO');
+                        }
+                    } else {
+                        $btnComenzar.text('INICIAR SESIÓN');
+                    }
+
+                    if (nombre.length > 0 && pass.length > 0) {
+                        $btnComenzar.removeAttr('disabled');
+                    } else {
+                        $btnComenzar.attr('disabled', 'disabled');
+                    }
+                }
+
+                $nombreInput.on('keyup input', function () {
+                    const nombre = $(this).val().trim();
+                    clearTimeout(timeoutBusqueda);
+
+                    if (nombre.length === 0) {
+                        usuarioExisteEnBD = false;
+                        procesarValidacion();
+                        return;
+                    }
+
+                    timeoutBusqueda = setTimeout(function () {
+                        $.ajax({
+                            url: '@Url.Action("VerificarUsuarioExistente", "Juego")',
+                            type: 'GET',
+                            data: { nombreReal: nombre },
+                            success: function (response) {
+                                if (response.existe) {
+                                    usuarioExisteEnBD = true;
+                                    $loginInput.val(response.loginExistente);
+                                } else {
+                                    usuarioExisteEnBD = false;
+                                }
+                                procesarValidacion();
+                            }
+                        });
+                    }, 400);
+                });
+
+                $passInput.on('input', procesarValidacion);
+                procesarValidacion();
+            }
+        });
+    </script>
+}
