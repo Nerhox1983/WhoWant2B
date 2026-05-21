@@ -269,7 +269,7 @@ namespace WhoWant2B.Controllers
         /// <returns>
         /// La vista "Index" configurada con las banderas de retiro activas y un modelo nulo, indicando que la partida actual ha concluido.
         /// </returns>
-        [HttpPost] // ◄ CRUCIAL: Para que intercepte el envío del formulario
+        [HttpPost]
         public async Task<IActionResult> Retirarse(int puntajeFinal, int idJugador)
         {
 

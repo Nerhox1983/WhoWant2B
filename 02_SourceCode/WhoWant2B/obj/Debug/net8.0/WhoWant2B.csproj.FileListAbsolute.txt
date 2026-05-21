@@ -147,3 +147,4 @@ F:\PruebaTecnica-Ciel2\02_SourceCode\WhoWant2B\bin\Debug\net8.0\runtimes\win\lib
 F:\PruebaTecnica-Ciel2\02_SourceCode\WhoWant2B\obj\Debug\net8.0\WhoWant2B.MvcApplicationPartsAssemblyInfo.cs
 F:\PruebaTecnica-Ciel2\02_SourceCode\WhoWant2B\bin\Debug\net8.0\X.PagedList.dll
 F:\PruebaTecnica-Ciel2\02_SourceCode\WhoWant2B\bin\Debug\net8.0\X.PagedList.Mvc.Core.dll
+F:\PruebaTecnica-Ciel2\02_SourceCode\WhoWant2B\obj\Debug\net8.0\WhoWant2B.sourcelink.json
