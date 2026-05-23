@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Collections;
+using WhoWant2B.Core.Interfaces;
 
 namespace WhoWant2B.Services
 {

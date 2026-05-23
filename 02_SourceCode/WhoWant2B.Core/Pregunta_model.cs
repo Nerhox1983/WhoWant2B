@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WhoWant2B.Models
+namespace WhoWant2B.Core.Models
 {
     public class Pregunta_model
     {
@@ -21,11 +21,8 @@ namespace WhoWant2B.Models
         public virtual Categoria_model? Categoria { get; set; }
 
         [ForeignKey(nameof(IdComplejidad))]
-        public virtual Complejidad_Model? Complejidad { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        public virtual Complejidad_model? Complejidad { get; set; }
+        
         public virtual ICollection<Opcion_model> Opciones { get; set; } = new List<Opcion_model>();
     }
 }

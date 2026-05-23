@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using WhoWant2B.Data;
+using WhoWant2B.Core.Interfaces;
+using WhoWant2B.Infrastructure.Data;
+using WhoWant2B.Infrastructure.Repositories;
+using WhoWant2B.Infrastructure.Services;
 using WhoWant2B.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -11,6 +13,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+builder.Services.AddScoped<IConfiguracionService, ConfiguracionService>();
+builder.Services.AddScoped<IJuegoService, JuegoService>();
+builder.Services.AddScoped<IAutenticacionService, AutenticacionService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 builder.Services.AddDistributedMemoryCache();

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace WhoWant2B
+namespace WhoWant2B.Core.Enums
 {
     public class Comunes
     {

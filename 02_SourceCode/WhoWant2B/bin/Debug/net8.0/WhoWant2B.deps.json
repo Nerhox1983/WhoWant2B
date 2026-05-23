@@ -12,6 +12,8 @@
           "Microsoft.EntityFrameworkCore.Design": "8.0.11",
           "Microsoft.EntityFrameworkCore.SqlServer": "8.0.11",
           "Microsoft.EntityFrameworkCore.Tools": "8.0.11",
+          "WhoWant2B.Core": "1.0.0",
+          "WhoWant2B.Infrastructure": "1.0.0",
           "X.PagedList.Mvc.Core": "10.5.9"
         },
         "runtime": {
@@ -918,6 +920,27 @@
             "fileVersion": "10.5.9.0"
           }
         }
+      },
+      "WhoWant2B.Core/1.0.0": {
+        "runtime": {
+          "WhoWant2B.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "WhoWant2B.Infrastructure/1.0.0": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.11",
+          "Microsoft.EntityFrameworkCore.SqlServer": "8.0.11",
+          "WhoWant2B.Core": "1.0.0"
+        },
+        "runtime": {
+          "WhoWant2B.Infrastructure.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -1472,6 +1495,16 @@
       "sha512": "sha512-LhZwvTyUtn+BYVVc4ERCfZeK+br76nPQy8GTXg4pL9jOazusAUNiGkKBRFL/owOgAdTRKPLtHj+pBfZup7weyg==",
       "path": "x.pagedlist.mvc.core/10.5.9",
       "hashPath": "x.pagedlist.mvc.core.10.5.9.nupkg.sha512"
+    },
+    "WhoWant2B.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WhoWant2B.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

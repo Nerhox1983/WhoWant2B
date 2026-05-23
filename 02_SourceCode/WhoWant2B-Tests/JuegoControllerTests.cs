@@ -5,9 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Text;
 using WhoWant2B.Controllers;
-using WhoWant2B.Data;
-using WhoWant2B.Models;
-using WhoWant2B.Services;
+using WhoWant2B.Core.Interfaces;
+using WhoWant2B.Core.Models;
+using WhoWant2B.Infrastructure.Data;
+using WhoWant2B.Infrastructure.Services;
 
 namespace WhoWant2B.Tests
 {
@@ -43,6 +44,14 @@ namespace WhoWant2B.Tests
         }
 
         private delegate void OutAction<T1, T2>(T1 outVal1, out T2 outVal2);
+        
+        private JuegoController CrearControllerConServiciosReales(ApplicationDbContext context, ISecurityService securityService)
+        {
+            var juegoService = new JuegoService(context);
+            var autenticacionService = new AutenticacionService(context);
+
+            return new JuegoController(juegoService, autenticacionService, securityService);
+        }
 
         #endregion
 
@@ -65,7 +74,7 @@ namespace WhoWant2B.Tests
             context.Usuarios.Add(usuarioPrueba);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var result = await controller.VerificarUsuarioExistente("Juan Perez");
             var jsonResult = Assert.IsType<JsonResult>(result);
             var data = jsonResult.Value;
@@ -87,7 +96,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var result = await controller.VerificarUsuarioExistente("Usuario Fantasma");
             var jsonResult = Assert.IsType<JsonResult>(result);
             var data = jsonResult.Value;
@@ -114,7 +123,7 @@ namespace WhoWant2B.Tests
                 .Setup(s => s.GetHash(It.IsAny<string>()))
                 .Returns(hashSimulado);
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var mockSession = new Mock<Microsoft.AspNetCore.Http.ISession>();
             var sessionDictionary = new Dictionary<string, byte[]>();
 
@@ -138,14 +147,18 @@ namespace WhoWant2B.Tests
             );
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
 
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["juegoIniciado"]));
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["juegoIniciado"]));
             var usuarioEnDb = await context.Usuarios.FirstOrDefaultAsync(u => u.Login == "nuevojugador");
 
+            var actualNombreReal = usuarioEnDb?.NombreReal;
+            var actualIdRol = usuarioEnDb?.IdRol;
+
             Assert.NotNull(usuarioEnDb);
-            Assert.Equal("Carlos Pérez", usuarioEnDb.NombreReal);
-            Assert.Equal(2, usuarioEnDb.IdRol);
+            Assert.Equal("Carlos Pérez", actualNombreReal);
+            Assert.Equal(2, actualIdRol);
         }
 
         [Fact]
@@ -170,7 +183,7 @@ namespace WhoWant2B.Tests
             context.Usuarios.Add(usuarioExistente);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var mockSession = new Mock<Microsoft.AspNetCore.Http.ISession>();
             var httpContext = new DefaultHttpContext { Session = mockSession.Object };
@@ -179,8 +192,9 @@ namespace WhoWant2B.Tests
             var result = await controller.GuardarUsuario("carlosp", "password123", 2, "Carlos Pérez");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["juegoIniciado"]));
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["juegoIniciado"]));
         }
 
         [Fact]
@@ -188,12 +202,13 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var result = await controller.GuardarUsuario(null, "pass123", 2, "Carlos");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
         }
 
         [Fact]
@@ -218,7 +233,7 @@ namespace WhoWant2B.Tests
             context.Usuarios.Add(usuarioExistente);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var tempDataMock = new Mock<ITempDataProvider>();
             controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
@@ -226,8 +241,9 @@ namespace WhoWant2B.Tests
             var result = await controller.GuardarUsuario("carlosp", "password_erronea", 2, "Carlos Pérez");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
-            Assert.False(Convert.ToBoolean(redirectResult.RouteValues["juegoIniciado"]));
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
+            Assert.False(Convert.ToBoolean(redirectResult.RouteValues?["juegoIniciado"]));
             Assert.Equal("La contraseña es incorrecta para este jugador.", controller.TempData["ErrorMessage"]);
         }
 
@@ -245,13 +261,14 @@ namespace WhoWant2B.Tests
             context.Opciones.Add(opcionCorrecta);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             controller.ControllerContext = GetMockControllerContext("IdNivelActual", "1");
 
             var result = await controller.ValidarRespuesta(10, 1, 1, 0, "");
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
         }
 
         [Fact]
@@ -264,10 +281,10 @@ namespace WhoWant2B.Tests
             context.Opciones.Add(opcionCorrecta);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var mockSession = new Mock<Microsoft.AspNetCore.Http.ISession>();
-            var sessionValue = System.Text.Encoding.UTF8.GetBytes("10");
+            var sessionValue = Encoding.UTF8.GetBytes("10");
             mockSession
                 .Setup(s => s.TryGetValue("IdJugadorActual", out sessionValue))
                 .Returns(true);
@@ -284,14 +301,18 @@ namespace WhoWant2B.Tests
             );
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["ganado"]));
-            Assert.False(Convert.ToBoolean(redirectResult.RouteValues["juegoIniciado"]));
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["ganado"]));
+            Assert.False(Convert.ToBoolean(redirectResult.RouteValues?["juegoIniciado"]));
 
             var historicoEnDb = await context.Historicos.FirstOrDefaultAsync();
+            var actualPuntosAcumulados = historicoEnDb?.PuntosAcumulados;
+            var actualIdJugador = historicoEnDb?.IdJugador;
+
             Assert.NotNull(historicoEnDb);
-            Assert.Equal(1000, historicoEnDb.PuntosAcumulados);
-            Assert.Equal(10, historicoEnDb.IdJugador);
+            Assert.Equal(1000, actualPuntosAcumulados);
+            Assert.Equal(10, actualIdJugador);
         }
 
         [Fact]
@@ -304,7 +325,7 @@ namespace WhoWant2B.Tests
             context.Opciones.Add(opcionIncorrecta);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var result = await controller.ValidarRespuesta(
                 idOpcion: 99,
@@ -315,9 +336,10 @@ namespace WhoWant2B.Tests
             );
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["perdiste"]));
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["juegoIniciado"]));
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["perdiste"]));
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["juegoIniciado"]));
         }
 
         [Fact]
@@ -325,7 +347,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var result = await controller.ValidarRespuesta(
                 idOpcion: 999,
@@ -336,7 +358,7 @@ namespace WhoWant2B.Tests
             );
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.True(Convert.ToBoolean(redirectResult.RouteValues["perdiste"]));
+            Assert.True(Convert.ToBoolean(redirectResult.RouteValues?["perdiste"]));
         }
 
         #endregion
@@ -346,26 +368,27 @@ namespace WhoWant2B.Tests
         [Fact]
         public async Task Retirarse_JugadorAutenticado_GuardaHistoricoYRedirigeAIndex()
         {
-            // Arrange
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             controller.ControllerContext = GetMockControllerContext("IdJugadorActual", "99");
 
-            // Act
             var result = await controller.Retirarse(puntajeFinal: 500, idJugador: 0);
 
-            // Assert
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
             Assert.Equal(500, redirectResult.RouteValues!["puntaje"]);
             Assert.Equal(true, redirectResult.RouteValues["retirado"]);
 
             var registroGuardado = await context.Historicos.FirstOrDefaultAsync();
+            var actualPuntosAcumulados = registroGuardado?.PuntosAcumulados;
+            var actualIdJugador = registroGuardado?.IdJugador;
+
             Assert.NotNull(registroGuardado);
-            Assert.Equal(500, registroGuardado.PuntosAcumulados);
-            Assert.Equal(99, registroGuardado.IdJugador);
+            Assert.Equal(500, actualPuntosAcumulados);
+            Assert.Equal(99, actualIdJugador);
         }
 
         [Fact]
@@ -373,7 +396,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var mockSession = new Mock<ISession>();
             byte[]? valueBytes = null;
             mockSession.Setup(s => s.TryGetValue("IdJugadorActual", out valueBytes)).Returns(false);
@@ -384,13 +407,17 @@ namespace WhoWant2B.Tests
             var result = await controller.Retirarse(puntajeFinal: 100, idJugador: 45);
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectResult.ActionName);
+            var actionName = redirectResult.ActionName;
+            Assert.Equal("Index", actionName);
             Assert.Equal(100, redirectResult.RouteValues!["puntaje"]);
 
             var registroGuardado = await context.Historicos.FirstOrDefaultAsync();
+            var actualPuntosAcumulados = registroGuardado?.PuntosAcumulados;
+            var actualIdJugador = registroGuardado?.IdJugador;
+
             Assert.NotNull(registroGuardado);
-            Assert.Equal(100, registroGuardado.PuntosAcumulados);
-            Assert.Equal(45, registroGuardado.IdJugador);
+            Assert.Equal(100, actualPuntosAcumulados);
+            Assert.Equal(45, actualIdJugador);
         }
 
         #endregion
@@ -402,7 +429,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var tempDataMock = new Mock<ITempDataProvider>();
             controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
 
@@ -419,7 +446,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var tempDataMock = new Mock<ITempDataProvider>();
             controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
@@ -430,70 +457,12 @@ namespace WhoWant2B.Tests
             Assert.Null(viewResult.ViewName);
         }
 
-        /*[Fact]
-        public async Task Index_JuegoActivo_BuscaYRetornaPreguntaConDatosEnViewBag()
-        {
-            using var context = GetInMemoryDbContext();
-            var mockSecurity = new Mock<ISecurityService>();
-
-            var categoria = new Categoria_model
-            {
-                IdCategoria = 1,
-                Nombre = "Historia",
-                Description = "Preguntas de historia general"
-            };
-
-            var tipoComplejidad = typeof(Pregunta_model).GetProperty("Complejidad")?.PropertyType;
-            object complejidadInstancia = null;
-
-            if (tipoComplejidad != null)
-            {
-                complejidadInstancia = Activator.CreateInstance(tipoComplejidad);
-                tipoComplejidad.GetProperty("IdComplejidad")?.SetValue(complejidadInstancia, 1);
-                tipoComplejidad.GetProperty("Nombre")?.SetValue(complejidadInstancia, "Fácil");
-                tipoComplejidad.GetProperty("Descripcion")?.SetValue(complejidadInstancia, "Nivel inicial");
-            }
-
-            var pregunta = new Pregunta_model
-            {
-                IdPregunta = 10,
-                IdComplejidad = 1,
-                Texto = "¿Cuál es la capital de Colombia?",
-                Categoria = categoria
-            };
-
-            typeof(Pregunta_model).GetProperty("Complejidad")?.SetValue(pregunta, complejidadInstancia);
-
-            context.Preguntas.Add(pregunta);
-            await context.SaveChangesAsync();
-
-            var controller = new JuegoController(context, mockSecurity.Object);
-
-            var tempDataMock = new Mock<ITempDataProvider>();
-            controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
-
-            var result = await controller.Index(
-                idCategoria: null,
-                puntaje: 100,
-                perdiste: false,
-                idComplejidad: 1,
-                conteoNivel: 0,
-                idsRespondidas: "1,2",
-                juegoIniciado: true
-            );
-
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsType<Pregunta_model>(viewResult.Model);
-            Assert.Equal(10, model.IdPregunta);
-            Assert.Equal("Historia", controller.ViewBag.NombreCategoria);
-        }*/
         [Fact]
         public async Task Index_JuegoActivo_BuscaYRetornaPreguntaConDatosEnViewBag()
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
 
-            // CORRECCIÓN CS0117 y CS9035: Cambiado 'Description' por 'Descripcion'
             var categoria = new Categoria_model
             {
                 IdCategoria = 1,
@@ -502,7 +471,7 @@ namespace WhoWant2B.Tests
             };
 
             var tipoComplejidad = typeof(Pregunta_model).GetProperty("Complejidad")?.PropertyType;
-            object complejidadInstancia = null;
+            object? complejidadInstancia = null;
 
             if (tipoComplejidad != null)
             {
@@ -525,7 +494,7 @@ namespace WhoWant2B.Tests
             context.Preguntas.Add(pregunta);
             await context.SaveChangesAsync();
 
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
 
             var tempDataMock = new Mock<ITempDataProvider>();
             controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
@@ -551,7 +520,7 @@ namespace WhoWant2B.Tests
         {
             using var context = GetInMemoryDbContext();
             var mockSecurity = new Mock<ISecurityService>();
-            var controller = new JuegoController(context, mockSecurity.Object);
+            var controller = CrearControllerConServiciosReales(context, mockSecurity.Object);
             var tempDataMock = new Mock<ITempDataProvider>();
             controller.TempData = new TempDataDictionary(new DefaultHttpContext(), tempDataMock.Object);
 

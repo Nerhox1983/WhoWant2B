@@ -1,17 +1,18 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using WhoWant2B.Controllers.Configuracion;
-using WhoWant2B.Data;
+using WhoWant2B.Core.Models;
+using WhoWant2B.Infrastructure.Data;
+using WhoWant2B.Infrastructure.Services;
 using WhoWant2B.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WhoWant2B.Tests
 {
     public class ConfiguracionControllerTests : IDisposable
     {
         private readonly ApplicationDbContext _context;
+        private readonly ConfiguracionService _service;
         private readonly ConfiguracionController _controller;
 
         public ConfiguracionControllerTests()
@@ -23,7 +24,9 @@ namespace WhoWant2B.Tests
             _context = new ApplicationDbContext(options);
             _context.Database.EnsureCreated();
 
-            _controller = new ConfiguracionController(_context);
+            // Instanciamos el servicio real con el contexto en memoria y se lo pasamos al controlador
+            _service = new ConfiguracionService(_context);
+            _controller = new ConfiguracionController(_service);
         }
 
         public void Dispose()
@@ -41,7 +44,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             controller.ModelState.AddModelError("Nombre", "El nombre es obligatorio");
 
@@ -124,7 +128,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.EditarCategoria(null);
@@ -141,7 +146,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.EditarCategoria(999);
@@ -174,7 +180,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.EliminarCategoria(888);
@@ -214,7 +221,8 @@ namespace WhoWant2B.Tests
             context.Preguntas.Add(pregunta);
             await context.SaveChangesAsync();
 
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.EditarPregunta(1) as ViewResult;
@@ -264,7 +272,8 @@ namespace WhoWant2B.Tests
             }
             await context.SaveChangesAsync();
 
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.Preguntas(null) as ViewResult;
@@ -272,7 +281,7 @@ namespace WhoWant2B.Tests
             // Assert
             result.Should().NotBeNull();
 
-            var model = result.Model as System.Collections.Generic.IEnumerable<Pregunta_model>;
+            var model = result.Model as IEnumerable<Pregunta_model>;
             model.Should().NotBeNull();
             model.Should().HaveCount(10);
 
@@ -317,7 +326,8 @@ namespace WhoWant2B.Tests
             }
             await context.SaveChangesAsync();
 
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.Preguntas(2) as ViewResult;
@@ -325,7 +335,7 @@ namespace WhoWant2B.Tests
             // Assert
             result.Should().NotBeNull();
 
-            var model = result.Model as System.Collections.Generic.IEnumerable<Pregunta_model>;
+            var model = result.Model as IEnumerable<Pregunta_model>;
             model.Should().NotBeNull();
             model.Should().HaveCount(2);
 
@@ -342,7 +352,8 @@ namespace WhoWant2B.Tests
                 .Options;
 
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             var result = await controller.CrearPregunta() as ViewResult;
 
@@ -380,7 +391,8 @@ namespace WhoWant2B.Tests
                 .Options;
 
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             var viewModel = new PreguntaConOpciones_viewModel
             {
@@ -414,7 +426,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             controller.ModelState.AddModelError("Pregunta.Texto", "El texto de la pregunta es obligatorio");
 
@@ -440,7 +453,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var resultNull = await controller.EditarPregunta(null);
@@ -459,9 +473,8 @@ namespace WhoWant2B.Tests
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
-
-            var pregunta = new Pregunta_model { IdPregunta = 5, Texto = "Pregunta Test", IdCategoria = 1, IdComplejidad = 1 };
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             // Act
             var result = await controller.EditarPregunta(99);
@@ -479,7 +492,8 @@ namespace WhoWant2B.Tests
                 .Options;
 
             using var context = new ApplicationDbContext(options);
-            var controller = new ConfiguracionController(context);
+            var service = new ConfiguracionService(context);
+            var controller = new ConfiguracionController(service);
 
             var pregunta = new Pregunta_model { IdPregunta = 10, Texto = "Pregunta a borrar" };
             var opciones = new List<Opcion_model>

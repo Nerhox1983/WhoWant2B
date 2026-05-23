@@ -13,4 +13,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.9" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WhoWant2B.Core\WhoWant2B.Core.csproj" />
+    <ProjectReference Include="..\WhoWant2B.Infrastructure\WhoWant2B.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>

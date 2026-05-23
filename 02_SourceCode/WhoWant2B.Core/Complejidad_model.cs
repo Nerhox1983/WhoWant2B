@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WhoWant2B.Models
+namespace WhoWant2B.Core.Models
 {
-    public class Complejidad_Model
+    public class Complejidad_model
     {
         [Key]
         public int IdComplejidad { get; set; }

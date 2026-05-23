@@ -1,4 +1,6 @@
-﻿namespace WhoWant2B.Models
+﻿using WhoWant2B.Core.Models;
+
+namespace WhoWant2B.Models
 {
     public class PreguntaConOpciones_viewModel
     {

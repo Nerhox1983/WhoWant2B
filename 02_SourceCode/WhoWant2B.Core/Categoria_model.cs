@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WhoWant2B.Models
+namespace WhoWant2B.Core.Models
 {
     public class Categoria_model
     {

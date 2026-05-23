@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WhoWant2B.Core.Models;
 using WhoWant2B.Models;
 
-namespace WhoWant2B.Data
+namespace WhoWant2B.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
     {
@@ -17,7 +18,7 @@ namespace WhoWant2B.Data
         public DbSet<Pregunta_model> Preguntas { get; set; }
         public DbSet<Opcion_model> Opciones { get; set; }
         public DbSet<Categoria_model> Categorias { get; set; }
-        public DbSet<Complejidad_Model> Complejidades { get; set; }
+        public DbSet<Complejidad_model> Complejidades { get; set; }
         public DbSet<EstadosJuego_model> EstadosJuego { get; set; }
         public DbSet<Usuario_model> Usuarios { get; set; }
         public DbSet<Historico_model> Historicos { get; set; }
@@ -28,15 +29,14 @@ namespace WhoWant2B.Data
             modelBuilder.Entity<Pregunta_model>().ToTable("Preguntas");
             modelBuilder.Entity<Opcion_model>().ToTable("Opciones");
             modelBuilder.Entity<Categoria_model>().ToTable("Categorias");
-            modelBuilder.Entity<Complejidad_Model>().ToTable("Complejidades");
+            modelBuilder.Entity<Complejidad_model>().ToTable("Complejidades");
             modelBuilder.Entity<EstadosJuego_model>().ToTable("EstadosJuego");
             
             modelBuilder.Entity<Opcion_model>()
-                .HasOne(o => o.Pregunta)          // Opcion tiene la propiedad de objeto "Pregunta"
-                .WithMany(p => p.Opciones)         // Pregunta tiene la colección "Opciones"
-                .HasForeignKey(o => o.IdPregunta); // La columna física es "IdPregunta"
-
-            // 3. Relaciones de la Pregunta con Categoría y Complejidad
+                .HasOne(o => o.Pregunta)
+                .WithMany(p => p.Opciones)
+                .HasForeignKey(o => o.IdPregunta);
+            
             modelBuilder.Entity<Pregunta_model>()
                 .HasOne(p => p.Categoria)
                 .WithMany()

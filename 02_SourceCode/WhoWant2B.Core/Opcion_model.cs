@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WhoWant2B.Models
+namespace WhoWant2B.Core.Models
 {
     public class Opcion_model
     {

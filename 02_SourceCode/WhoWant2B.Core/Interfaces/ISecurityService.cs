@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WhoWant2B.Services
+﻿namespace WhoWant2B.Core.Interfaces
 {
     /// <summary>
     /// Define las operaciones necesarias para gestionar la seguridad y el hashing de datos.
