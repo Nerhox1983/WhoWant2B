@@ -5,11 +5,7 @@ using WhoWant2B.Models;
 namespace WhoWant2B.Infrastructure.Data
 {
     public class ApplicationDbContext : DbContext
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="options"></param>
+    {        
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

@@ -6,12 +6,16 @@ using WhoWant2B.Models;
 
 namespace WhoWant2B.Controllers.Configuracion
 {
+    /// <summary>
+    /// Controlador administrativo encargado de gestionar el mantenimiento (CRUD) de las entidades 
+    /// base del juego: Categorías y Preguntas con sus respectivas opciones.
+    /// </summary>
     public class ConfiguracionController : Controller
     {
         private readonly IConfiguracionService _configuracionService;
 
         /// <summary>
-        /// Inicializa una nueva instancia de la clase <see cref="ConfiguracionController"/>.
+        /// Inicializa una nueva instancia de <see cref="ConfiguracionController"/> mediante inyección de dependencias.
         /// </summary>
         /// <param name="configuracionService">El servicio de negocio para la gestión de configuraciones del sistema.</param>
         public ConfiguracionController(IConfiguracionService configuracionService)
@@ -20,8 +24,9 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Muestra la vista principal de la configuración.
+        /// Muestra el panel principal de administración desde donde se puede navegar a la gestión de categorías o preguntas.
         /// </summary>
+        /// <returns>La vista de inicio del panel de configuración.</returns>
         [HttpGet]
         public IActionResult Index()
         {
@@ -31,8 +36,10 @@ namespace WhoWant2B.Controllers.Configuracion
         #region CRUD: Categorías
 
         /// <summary>
-        /// Obtiene de forma asíncrona la lista de categorías y muestra su vista correspondiente con paginación.
+        /// Obtiene la lista de categorías registradas en el sistema aplicando una lógica de paginación.
         /// </summary>
+        /// <param name="page">Número de página solicitado para la visualización de datos.</param>
+        /// <returns>Una vista que contiene la colección de categorías para la página especificada.</returns>
         [HttpGet]
         public async Task<IActionResult> Categorias(int? page)
         {
@@ -49,8 +56,9 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Muestra la vista con el formulario para crear una nueva categoría.
+        /// Muestra el formulario vacío para el registro de una nueva categoría de preguntas.
         /// </summary>
+        /// <returns>La vista de creación de categorías.</returns>
         [HttpGet]
         public IActionResult CrearCategoria()
         {
@@ -58,8 +66,10 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Procesa de forma asíncrona los datos del formulario para registrar una nueva categoría.
+        /// Procesa la información enviada desde el formulario de creación para persistir una nueva categoría.
         /// </summary>
+        /// <param name="categoria">Modelo que contiene los datos de la categoría a registrar.</param>
+        /// <returns>Redirección al listado de categorías si el proceso es exitoso; de lo contrario, retorna la misma vista con errores de validación.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CrearCategoria(Categoria_model categoria)
@@ -73,8 +83,10 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Muestra de forma asíncrona la vista de edición para una categoría específica basada en su identificador.
+        /// Recupera los datos de una categoría específica para su edición.
         /// </summary>
+        /// <param name="id">Identificador único de la categoría.</param>
+        /// <returns>La vista de edición con los datos cargados, o un resultado <see cref="NotFoundResult"/> si el ID es nulo o no existe.</returns>
         [HttpGet]
         public async Task<IActionResult> EditarCategoria(int? id)
         {
@@ -87,8 +99,11 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Procesa de forma asíncrona los cambios guardados en el formulario para actualizar una categoría existente.
+        /// Procesa y actualiza los cambios realizados en una categoría existente.
         /// </summary>
+        /// <param name="id">Identificador de la categoría (para verificación de integridad).</param>
+        /// <param name="categoria">Modelo con los datos actualizados.</param>
+        /// <returns>Redirección al listado de categorías tras la actualización o la vista actual si hay errores en el modelo.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarCategoria(int id, Categoria_model categoria)
@@ -104,8 +119,10 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Elimina de forma asíncrona una categoría específica de la base de datos basada en su identificador.
+        /// Elimina físicamente una categoría del sistema.
         /// </summary>
+        /// <param name="id">Identificador de la categoría a eliminar.</param>
+        /// <returns>Redirección al listado de categorías una vez completada la acción.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarCategoria(int id)
@@ -119,8 +136,10 @@ namespace WhoWant2B.Controllers.Configuracion
         #region CRUD: Preguntas
 
         /// <summary>
-        /// Obtiene de forma asíncrona la lista de preguntas paginada de 10 en 10.
+        /// Obtiene el listado general de preguntas del banco de trivias con soporte para paginación de 10 registros.
         /// </summary> 
+        /// <param name="page">Número de página actual a consultar.</param>
+        /// <returns>Vista con la lista de preguntas paginada.</returns>
         [HttpGet]
         public async Task<IActionResult> Preguntas(int? page)
         {
@@ -137,8 +156,9 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Muestra de forma asíncrona la vista para crear una nueva pregunta, preparando los listados de selección.
+        /// Prepara el entorno para la creación de una nueva pregunta, inicializando las listas de selección y las opciones vacías.
         /// </summary>
+        /// <returns>Vista de creación con un ViewModel que contiene la pregunta y 4 opciones inicializadas.</returns>
         [HttpGet]
         public async Task<IActionResult> CrearPregunta()
         {
@@ -158,8 +178,11 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Procesa de forma asíncrona la creación de una nueva pregunta junto con su listado de opciones asociadas.
+        /// Realiza la persistencia de una pregunta y sus cuatro opciones relacionadas en una sola operación transaccional.
         /// </summary>
+        /// <param name="model">ViewModel que agrupa la entidad Pregunta y su lista de Opciones.</param>
+        /// <param name="CorrectaIndex">Índice (0-3) que identifica cuál de las opciones marcadas es la respuesta válida.</param>
+        /// <returns>Redirección al listado de preguntas si es exitoso; de lo contrario, recarga el formulario con los mensajes de error.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CrearPregunta(PreguntaConOpciones_viewModel model, int CorrectaIndex)
@@ -184,8 +207,10 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Muestra de forma asíncrona la vista de edición para una pregunta específica, cargando sus opciones relacionadas.
+        /// Carga los datos de una pregunta existente y sus opciones asociadas para su modificación.
         /// </summary>
+        /// <param name="id">Identificador de la pregunta a editar.</param>
+        /// <returns>Vista de edición con el modelo cargado, o <see cref="NotFoundResult"/> si el registro no se encuentra.</returns>
         [HttpGet]
         public async Task<IActionResult> EditarPregunta(int? id)
         {
@@ -210,8 +235,12 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Procesa de forma asíncrona las modificaciones de una pregunta existente y sus opciones asociadas.
+        /// Actualiza la información de una pregunta y sincroniza sus opciones asociadas en la base de datos.
         /// </summary>
+        /// <param name="id">Identificador de la pregunta para validación de ruta.</param>
+        /// <param name="model">ViewModel con los datos modificados de la pregunta y opciones.</param>
+        /// <param name="CorrectaIndex">Nuevo índice de la opción marcada como correcta.</param>
+        /// <returns>Redirección al listado general de preguntas tras la operación exitosa.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditarPregunta(int id, PreguntaConOpciones_viewModel model, int CorrectaIndex)
@@ -238,8 +267,10 @@ namespace WhoWant2B.Controllers.Configuracion
         }
 
         /// <summary>
-        /// Elimina de forma asíncrona una pregunta específica y todas sus opciones asociadas.
+        /// Elimina una pregunta del banco de datos. Las opciones asociadas se eliminan en cascada según la lógica del servicio.
         /// </summary>
+        /// <param name="id">Identificador único de la pregunta a remover.</param>
+        /// <returns>Redirección al listado de preguntas actualizado.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarPregunta(int id)

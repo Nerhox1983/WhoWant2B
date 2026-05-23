@@ -9,11 +9,17 @@ using WhoWant2B.Models;
 
 namespace WhoWant2B.Tests
 {
+    /// <summary>
+    /// Pruebas unitarias para el controlador de configuración, encargado de la gestión de categorías y preguntas.
+    /// </summary>
     public class ConfiguracionControllerTests : IDisposable
     {
         private readonly ApplicationDbContext _context;
         private readonly ConfiguracionService _service;
         private readonly ConfiguracionController _controller;
+        
+        private const string ErrorMensajeNombreObligatorio = "El nombre es obligatorio";
+        private const string ErrorMensajeTextoPreguntaObligatorio = "El texto de la pregunta es obligatorio";
 
         public ConfiguracionControllerTests()
         {
@@ -22,13 +28,14 @@ namespace WhoWant2B.Tests
                 .Options;
 
             _context = new ApplicationDbContext(options);
-            _context.Database.EnsureCreated();
-
-            // Instanciamos el servicio real con el contexto en memoria y se lo pasamos al controlador
+            _context.Database.EnsureCreated();            
             _service = new ConfiguracionService(_context);
             _controller = new ConfiguracionController(_service);
         }
 
+        /// <summary>
+        /// Libera los recursos de la base de datos en memoria después de cada prueba.
+        /// </summary>
         public void Dispose()
         {
             _context.Database.EnsureDeleted();
@@ -36,6 +43,9 @@ namespace WhoWant2B.Tests
         }
 
         #region Pruebas de Categorías
+        /// <summary>
+        /// Verifica que si el modelo de categoría es inválido, se retorne la vista con el mismo modelo.
+        /// </summary>
         [Fact]
         public async Task CrearCategoria_Post_ModelStateInvalido_RetornaVistaConModelo()
         {
@@ -47,7 +57,7 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            controller.ModelState.AddModelError("Nombre", "El nombre es obligatorio");
+            controller.ModelState.AddModelError(nameof(Categoria_model.Nombre), ErrorMensajeNombreObligatorio);
 
             var modeloInvalido = new Categoria_model { IdCategoria = 0, Nombre = "", Descripcion = "" };
 
@@ -59,6 +69,9 @@ namespace WhoWant2B.Tests
             result.Model.Should().BeEquivalentTo(modeloInvalido);
         }
 
+        /// <summary>
+        /// Verifica que la acción Categorías retorne la lista paginada correctamente.
+        /// </summary>
         [Fact]
         public async Task Categorias_RetornaVistaConListaPaginada()
         {
@@ -79,6 +92,9 @@ namespace WhoWant2B.Tests
             ((int)_controller.ViewBag.TotalPaginas).Should().Be(1);
         }
 
+        /// <summary>
+        /// Verifica que una categoría válida se agregue correctamente y redirija a la lista.
+        /// </summary>
         [Fact]
         public async Task CrearCategoria_Post_ModeloValido_AgregaCategoriaYRedirige()
         {
@@ -94,6 +110,9 @@ namespace WhoWant2B.Tests
             categoriaEnDb!.Nombre.Should().Be("Geografía");
         }
 
+        /// <summary>
+        /// Verifica el retorno de NotFound cuando se busca una categoría inexistente.
+        /// </summary>
         [Fact]
         public async Task EditarCategoria_Get_IdNoExistente_RetornaNotFound()
         {
@@ -102,6 +121,9 @@ namespace WhoWant2B.Tests
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        /// <summary>
+        /// Verifica que la actualización de una categoría sea exitosa y redirija.
+        /// </summary>
         [Fact]
         public async Task EditarCategoria_Post_IdValido_ActualizaYRedirige()
         {
@@ -120,10 +142,13 @@ namespace WhoWant2B.Tests
             modificadoEnDb!.Nombre.Should().Be("Cine y TV");
         }
 
+        /// <summary>
+        /// Verifica que el controlador maneje correctamente un ID nulo en la edición.
+        /// </summary>
         [Fact]
         public async Task EditarCategoria_Get_IdEsNull_RetornaNotFound()
         {
-            // Arrange
+            
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
@@ -131,31 +156,35 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            // Act
+            
             var result = await controller.EditarCategoria(null);
 
-            // Assert
+            
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        /// <summary>
+        /// Verifica el comportamiento cuando se intenta editar una categoría que no existe en BD.
+        /// </summary>
         [Fact]
         public async Task EditarCategoria_Get_CategoriaNoExiste_RetornaNotFound()
         {
-            // Arrange
+           
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
-
-            // Act
+            
             var result = await controller.EditarCategoria(999);
-
-            // Assert
+            
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        /// <summary>
+        /// Verifica que la eliminación de una categoría funcione y redirija.
+        /// </summary>
         [Fact]
         public async Task EliminarCategoria_Post_EliminaRegistroYRedirige()
         {
@@ -172,32 +201,34 @@ namespace WhoWant2B.Tests
             eliminado.Should().BeNull();
         }
 
+        /// <summary>
+        /// Verifica que al intentar eliminar un ID inexistente se mantenga el flujo de redirección.
+        /// </summary>
         [Fact]
         public async Task EliminarCategoria_Post_IdNoExiste_RetornaRedirect()
-        {
-            // Arrange
+        {            
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             using var context = new ApplicationDbContext(options);
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
-
-            // Act
+            
             var result = await controller.EliminarCategoria(888);
 
-            // Assert
             var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-            redirectResult.ActionName.Should().Be("Categorias");
+            redirectResult.ActionName.Should().Be(nameof(ConfiguracionController.Categorias));
         }
 
         #endregion
 
         #region Pruebas de Preguntas
+        /// <summary>
+        /// Verifica que la edición de pregunta cargue correctamente el modelo y las listas de selección.
+        /// </summary>
         [Fact]
         public async Task EditarPregunta_Get_IdExiste_RetornaVistaConModeloYViewBag()
         {
-            // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
@@ -224,10 +255,8 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            // Act
             var result = await controller.EditarPregunta(1) as ViewResult;
 
-            // Assert
             result.Should().NotBeNull();
 
             var categorias = (result.ViewData["Categorias"] ?? result.ViewData["IdCategoria"]) as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
@@ -236,10 +265,12 @@ namespace WhoWant2B.Tests
             result.Model.Should().NotBeNull();
         }
 
+        /// <summary>
+        /// Verifica la lógica de paginación por defecto para el listado de preguntas.
+        /// </summary>
         [Fact]
         public async Task Preguntas_SinEspecificarPagina_RetornaPrimerasDiezPreguntasYViewBag()
         {
-            // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
@@ -275,10 +306,8 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            // Act
             var result = await controller.Preguntas(null) as ViewResult;
 
-            // Assert
             result.Should().NotBeNull();
 
             var model = result.Model as IEnumerable<Pregunta_model>;
@@ -290,10 +319,12 @@ namespace WhoWant2B.Tests
             ((int)controller.ViewBag.TotalRegistros).Should().Be(12);
         }
 
+        /// <summary>
+        /// Verifica que la navegación a la segunda página de preguntas salte los registros correctos.
+        /// </summary>
         [Fact]
         public async Task Preguntas_SegundaPagina_SaltaElementosYRetornaRegistrosRestantes()
         {
-            // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
@@ -329,10 +360,8 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            // Act
             var result = await controller.Preguntas(2) as ViewResult;
 
-            // Assert
             result.Should().NotBeNull();
 
             var model = result.Model as IEnumerable<Pregunta_model>;
@@ -344,6 +373,9 @@ namespace WhoWant2B.Tests
             ((int)controller.ViewBag.TotalRegistros).Should().Be(12);
         }
 
+        /// <summary>
+        /// Verifica que el formulario de creación de pregunta inicialice las 4 opciones requeridas.
+        /// </summary>
         [Fact]
         public async Task CrearPregunta_Get_InicializaViewModelConCuatroOpcionesYViewBag()
         {
@@ -382,6 +414,9 @@ namespace WhoWant2B.Tests
             listaOpciones.Should().HaveCount(4);
         }
 
+        /// <summary>
+        /// Verifica que una pregunta nueva con sus opciones se guarde correctamente.
+        /// </summary>
         [Fact]
         public async Task CrearPregunta_Post_DatosValidos_GuardaPreguntaYSuOpcionCorrecta()
         {
@@ -418,6 +453,9 @@ namespace WhoWant2B.Tests
             Assert.False(preguntaEnDb.Opciones.ElementAt(0).Valida);
         }
 
+        /// <summary>
+        /// Verifica que si falla la validación al editar una pregunta, se retorne el ViewModel original.
+        /// </summary>
         [Fact]
         public async Task EditarPregunta_Post_ModelStateInvalido_RetornaVistaConModelo()
         {
@@ -429,7 +467,7 @@ namespace WhoWant2B.Tests
             var service = new ConfiguracionService(context);
             var controller = new ConfiguracionController(service);
 
-            controller.ModelState.AddModelError("Pregunta.Texto", "El texto de la pregunta es obligatorio");
+            controller.ModelState.AddModelError("Pregunta.Texto", ErrorMensajeTextoPreguntaObligatorio);
 
             var viewModelInvalido = new PreguntaConOpciones_viewModel
             {
@@ -445,6 +483,9 @@ namespace WhoWant2B.Tests
             result.Model.Should().BeEquivalentTo(viewModelInvalido);
         }
 
+        /// <summary>
+        /// Verifica el manejo de errores para IDs nulos o inexistentes en la carga de edición de preguntas.
+        /// </summary>
         [Fact]
         public async Task EditarPregunta_Get_IdEsNullOIdNoExiste_RetornaNotFound()
         {
@@ -465,6 +506,9 @@ namespace WhoWant2B.Tests
             resultNoExiste.Should().BeOfType<NotFoundResult>();
         }
 
+        /// <summary>
+        /// Verifica que el ID de la URL coincida con el ID del modelo en el POST de edición.
+        /// </summary>
         [Fact]
         public async Task EditarPregunta_Post_IdNoCoincideConModelo_RetornaNotFound()
         {
@@ -483,6 +527,9 @@ namespace WhoWant2B.Tests
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        /// <summary>
+        /// Verifica que al eliminar una pregunta, se borren también en cascada sus opciones asociadas.
+        /// </summary>
         [Fact]
         public async Task EliminarPregunta_Post_EliminaPreguntaYOpcionesAsociadas()
         {
@@ -516,7 +563,6 @@ namespace WhoWant2B.Tests
             var opcionesRestantes = await context.Opciones.Where(o => o.IdPregunta == 10).ToListAsync();
             opcionesRestantes.Should().BeEmpty();
         }
-
         #endregion
     }
 }

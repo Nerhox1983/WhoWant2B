@@ -4,12 +4,22 @@ using static WhoWant2B.Core.Enums.Comunes;
 
 namespace WhoWant2B.Controllers
 {
+    /// <summary>
+    /// Controlador encargado de gestionar el flujo principal del juego de trivia, 
+    /// incluyendo la lógica de niveles, validación de respuestas y autenticación de jugadores.
+    /// </summary>
     public class JuegoController : Controller
     {
         private readonly IJuegoService _juegoService;
         private readonly IAutenticacionService _autenticacionService;
         private readonly ISecurityService _securityService;
 
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="JuegoController"/>.
+        /// </summary>
+        /// <param name="juegoService">Servicio para la lógica del motor de juego.</param>
+        /// <param name="autenticacionService">Servicio para la gestión de usuarios.</param>
+        /// <param name="securityService">Servicio para el manejo de hashes y seguridad.</param>
         public JuegoController(
             IJuegoService juegoService,
             IAutenticacionService autenticacionService,
@@ -20,6 +30,19 @@ namespace WhoWant2B.Controllers
             _securityService = securityService;
         }
 
+        /// <summary>
+        /// Acción principal que renderiza la vista del juego. Gestiona los diferentes estados (inicio, progreso, victoria, derrota o retiro).
+        /// </summary>
+        /// <param name="idCategoria">Identificador opcional de la categoría seleccionada.</param>
+        /// <param name="puntaje">Puntaje acumulado actual.</param>
+        /// <param name="perdiste">Flag que indica si el jugador ha fallado una respuesta.</param>
+        /// <param name="idComplejidad">Nivel de dificultad actual (1 a 5).</param>
+        /// <param name="conteoNivel">Número de preguntas respondidas correctamente en el nivel de complejidad actual.</param>
+        /// <param name="idsRespondidas">Cadena con los IDs de preguntas ya respondidas para evitar repeticiones.</param>
+        /// <param name="juegoIniciado">Flag que indica si hay una partida activa.</param>
+        /// <param name="ganado">Flag que indica si el jugador completó todos los niveles.</param>
+        /// <param name="retirado">Flag que indica si el jugador decidió retirarse con el puntaje actual.</param>
+        /// <returns>La vista del juego con el modelo de la pregunta actual o nulo si el juego no ha iniciado o ha terminado.</returns>
         public async Task<IActionResult> Index(int? idCategoria, int puntaje = 0, bool perdiste = false, int idComplejidad = 1, int conteoNivel = 0, string idsRespondidas = "", bool juegoIniciado = false, bool ganado = false, bool retirado = false)
         {
             ViewBag.Puntaje = puntaje;
@@ -60,6 +83,15 @@ namespace WhoWant2B.Controllers
             return View(pregunta);
         }
 
+        /// <summary>
+        /// Procesa la respuesta seleccionada por el usuario y determina si avanza de nivel, gana o pierde.
+        /// </summary>
+        /// <param name="idOpcion">ID de la opción elegida por el jugador.</param>
+        /// <param name="puntajeActual">Puntaje antes de validar la respuesta.</param>
+        /// <param name="idComplejidad">Dificultad actual de la pregunta.</param>
+        /// <param name="conteoNivel">Progreso actual dentro de la complejidad (3 aciertos para subir).</param>
+        /// <param name="idsRespondidas">Historial de preguntas respondidas en la sesión.</param>
+        /// <returns>Redirección a <see cref="Index"/> con el nuevo estado del juego.</returns>
         [HttpPost]
         public async Task<IActionResult> ValidarRespuesta(int idOpcion, int puntajeActual, int idComplejidad, int conteoNivel, string idsRespondidas)
         {
@@ -107,6 +139,14 @@ namespace WhoWant2B.Controllers
             });
         }
 
+        /// <summary>
+        /// Gestiona el registro de un nuevo jugador o el inicio de sesión si el login ya existe.
+        /// </summary>
+        /// <param name="login">Nombre de usuario/login.</param>
+        /// <param name="password">Contraseña en texto plano.</param>
+        /// <param name="idRol">Rol asignado (Jugador por defecto).</param>
+        /// <param name="nombreReal">Nombre completo del usuario.</param>
+        /// <returns>Redirección al juego si es exitoso, o a la vista actual con mensaje de error si falla.</returns>
         [HttpPost]
         public async Task<IActionResult> GuardarUsuario(string login, string password, int idRol, string nombreReal)
         {
@@ -136,6 +176,11 @@ namespace WhoWant2B.Controllers
             return RedirectToAction("Index", new { juegoIniciado = true });
         }
 
+        /// <summary>
+        /// Verifica mediante una llamada asíncrona (AJAX) si un jugador ya existe basándose en su nombre real.
+        /// </summary>
+        /// <param name="nombreReal">Nombre completo a buscar.</param>
+        /// <returns>Objeto JSON indicando si existe y cuál es su login asociado.</returns>
         [HttpGet]
         public async Task<IActionResult> VerificarUsuarioExistente(string nombreReal)
         {
@@ -147,6 +192,12 @@ namespace WhoWant2B.Controllers
                 : Json(new { existe = false });
         }
 
+        /// <summary>
+        /// Registra el fin de la partida por decisión del jugador, salvaguardando el puntaje obtenido hasta el momento.
+        /// </summary>
+        /// <param name="puntajeFinal">Puntaje acumulado al momento del retiro.</param>
+        /// <param name="idJugador">ID del jugador (usado como respaldo si no hay sesión activa).</param>
+        /// <returns>Redirección a la vista final de retiro.</returns>
         [HttpPost]
         public async Task<IActionResult> Retirarse(int puntajeFinal, int idJugador)
         {
